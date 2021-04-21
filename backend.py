@@ -16,10 +16,8 @@ class Num:
         """
         try:
             value = self.numerator / self.denominator
-        except ZeroDivisionError:
-            return "Division by 0"
-        except TypeError:
-            return self.numerator
+        except:
+            return "Error"
         else:
             return value
 
@@ -40,11 +38,20 @@ class Num:
             return False
 
     def delete(self):
+        self.normalise()
         if self.decimal:
             self.denominator /= 10
         self.numerator -= self.numerator % 10
         self.numerator /= 10
 
+    def normalise(self):
+        while self.numerator != round(self.numerator):
+            self.numerator *= 10
+            self.denominator *= 10
+        if self.value() != round(self.value()):
+            self.decimal = True
+        else:
+            self.decimal = False
 
 class Calc:
     """
@@ -63,95 +70,75 @@ class Calc:
         # more n-s may be included in the future
         self.active = self.n1
         self.operation = ""
+        self.const = ("Pi", "euler")
         self.final = None
         self.mem = Num()
 
-    def __type(self, data):
-        """
-        returns the type of data;
-        a redundant method that could be
-        incorporated into newdigit, but
-        I hate overly long functions.
-        """
-        data = str(data) # data should already be a string, but better safe than sorry...
-        if data in "1234567890":  # for digits
-            return "n"
-        elif data in "+-*/":  # for two-number operations
-            return "o"
-        elif data == ".":  # for the decimal point
-            return "d"
-        elif data == "enter":  # for enter/equal sign
-            return "e"
-        elif data == "c": # for clear or reset
-            return "c"
-        elif data == "backspace": # for backspace or delete
-            return "b"
-        elif data == "sqrt": # for the square root
-            return "r"
-        elif data == "i": # for inversion
-            return "i"
-        elif data == "m": # for memory
-            return "m"
-        elif data == "r": # for reading memory
-            return "mr"
-        else:  # maybe an exception should be raised or idk
-            pass
 
     def newdigit(self, new):
         """
         receives new input, identifies it
         and performs the appropriate operation
         """
-        print("numerator1", self.n1.numerator)
-        print("denominator1", self.n1.denominator)
-        print("value1", self.n1.value())
-        print("isDecimal1", self.n1.decimal)
-        print("numerator2", self.n2.numerator)
-        print("denominator2", self.n2.denominator)
-        print("value2", self.n2.value())
-        print("isDecimal2", self.n2.decimal)
 
-        new_t = self.__type(new)
-        if new_t == "n":  # if new is a digit, appends to the operand
+        new = str(new)
+        if new in "1234567890":  # if new is a digit, appends to the operand
             self.__append(new)
-        elif new_t == "o":  # sets operation& switches to next number
+        elif new in("+", "-", "*", "/", "exp", "log", "sqrt"):
             self.__operate(new)
-        elif new_t == "d":  # triggers self.__decimal
+            if new is "sqrt":
+                self.__execute()
+        elif new is "enter":  # executes the binomial opeation
+            self.__execute()
+        elif new is ".":  # triggers self.__decimal
             self.__decimal()
-        elif new_t == "e":  # executes the binomial opeation
-            self.__execute()
-        elif new_t == "c": # clears/resets the calculator
+        elif new is "c": # clears/resets the calculator
             self.reinit()
-        elif new_t == "b": # retracts the last digit
+        elif new is "backspace": # retracts the last digit
             self.active.delete()
-        elif new_t == "r": # takes the square root of the input
-            self.__operate(new)
-            self.__execute()
-        elif new_t == "i":
+        elif new is "i":
             self.active.denominator *= -1
-        elif new_t == "m": # writes to memory
+        elif new is "m": # writes to memory
             if self.final is None:
                 self.__memorise(self.active) # memorises the active user input
             else:
                 self.__memorise(self.final) # memorises the result of the previous operation
-        elif new_t == "mr": # reads from memory
+        elif new is "r": # reads from memory
             self.__recall(self.mem)
+        elif new in self.const:
+            self.active.reinit()
+            if new is "Pi":
+                self.active.numerator = math.pi
+            elif new is "euler":
+                self.active.numerator = math.e
+        elif new in ("sin", "cos", "tan", "asin", "acos", "atan"):
+            self.final = Num()
+            if new is "sin":
+                self.final.numerator = math.sin(self.active.value())
+            elif new is "cos":
+                self.final.numerator = math.cos(self.active.value())
+            elif new is "tan":
+                self.final.numerator = math.tan(self.active.value())
+            elif new is "asin":
+                self.final.numerator = math.asin(self.active.value())
+            elif new is "acos":
+                self.final.numerator = math.acos(self.active.value())
+            elif new is "atan":
+                self.final.numerator = math.atan(self.active.value())
         else:   # more can come in the future (exponents, trigonometry, logarithm, etc.)
             pass
 
     def __append(self, num):
         """appends num to the active operand"""
+        self.active.normalise()
         if self.final is not None:
             self.reinit()
-        if self.active.value() != int(self.active.value()):
-            self.active.decimal = True
-        else:
-            self.decimal = False
         num = int(num)
         if self.active.decimal:
             self.active.denominator *= 10
         self.active.numerator = self.active.numerator*10 + num
         self.active.toolong()
+
 
     def __operate(self, operation):
         """stores the operation and prepares for the next input"""
@@ -165,6 +152,16 @@ class Calc:
     def __execute(self):
         """returns the result of the operation"""
         self.final = Num()
+        try:
+            for i in (self.n1, self.n2):
+                if i.value() >= 0:
+                    i.numerator = abs(i.numerator)
+                    i.denominator = abs(i.denominator)
+                else:
+                    i.numerator = 0 - abs(i.numerator)
+                    i.denominator = abs(i.denominator)
+        except:
+            pass
         if self.operation == "+":
             self.final.numerator = (self.n1.numerator*self.n2.denominator) + (self.n2.numerator*self.n1.denominator)
             self.final.denominator = self.n1.denominator*self.n2.denominator
@@ -182,22 +179,15 @@ class Calc:
                 self.final.numerator = math.sqrt(self.n1.numerator)
                 self.final.denominator = math.sqrt(self.n1.denominator)
             except ValueError:
-                self.final.numerator = "No real root"
+                self.final.numerator = "nope"
+        elif self.operation == "log":
+            self.final.numerator = math.log(self.n2.value(), self.n1.value())
+        elif self.operation == "exp":
+            self.final.numerator = self.n1.numerator**self.n2.value()
+            self.final.denominator = self.n1.denominator**self.n2.value()
         else:  # should be elaborated on further
             self.final.numerator = self.n1.numerator
             self.final.denominator = self.n1.denominator
-        if self.final.value() >= 0:
-            self.final.numerator = abs(self.final.numerator)
-            self.final.denominator = abs(self.final.denominator)
-        print("numerator1", self.n1.numerator)
-        print("denominator1", self.n1.denominator)
-        print("value1", self.n1.value())
-        print("isDecimal1", self.n1.decimal)
-        print("numerator2", self.n2.numerator)
-        print("denominator2", self.n2.denominator)
-        print("value2", self.n2.value())
-        print("isDecimal2", self.n2.decimal)
-        print(self.final.value())
 
     def reinit(self):
         """resets to the starting values"""
@@ -223,3 +213,5 @@ class Calc:
         self.active.numerator = memo.numerator
         self.active.denominator = memo.denominator
         self.active.decimal = memo.decimal
+        self.active.toolong()
+        self.active.normalise()
