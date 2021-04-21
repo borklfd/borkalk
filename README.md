@@ -1,4 +1,4 @@
-# borkalk v0.4
+# borKalk
 simple calculator and ui
 
 source code available at http://www.github.com/borklfd/borkalk
