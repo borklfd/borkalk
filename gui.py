@@ -74,6 +74,26 @@ class CGui:
                                      height=self.btnH, width=self.btnW, font=self.font)
         self.btnMre = tkinter.Button(self.cwindow, text="MR", command=lambda: self.on_press("r"),
                                      height=self.btnH, width=self.btnW, font=self.font)
+        self.btnSqe = tkinter.Button(self.cwindow, text="x^y", command=lambda: self.on_press("exp"),
+                                     height=self.btnH, width=self.btnW, font=self.font)
+        self.btnLog = tkinter.Button(self.cwindow, text="log", command=lambda: self.on_press("log"),
+                                     height=self.btnH, width=self.btnW, font=self.font)
+        self.btnSin = tkinter.Button(self.cwindow, text="sin", command=lambda: self.on_press("sin"),
+                                     height=self.btnH, width=self.btnW, font=self.font)
+        self.btnCos = tkinter.Button(self.cwindow, text="cos", command=lambda: self.on_press("cos"),
+                                     height=self.btnH, width=self.btnW, font=self.font)
+        self.btnTan = tkinter.Button(self.cwindow, text="tan", command=lambda: self.on_press("tan"),
+                                     height=self.btnH, width=self.btnW, font=self.font)
+        self.btnAsin = tkinter.Button(self.cwindow, text="asin", command=lambda: self.on_press("asin"),
+                                     height=self.btnH, width=self.btnW, font=self.font)
+        self.btnAcos = tkinter.Button(self.cwindow, text="acos", command=lambda: self.on_press("acos"),
+                                     height=self.btnH, width=self.btnW, font=self.font)
+        self.btnAtan = tkinter.Button(self.cwindow, text="atan", command=lambda: self.on_press("atan"),
+                                     height=self.btnH, width=self.btnW, font=self.font)
+        self.btnPi = tkinter.Button(self.cwindow, text="π", command=lambda: self.on_press("Pi"),
+                                     height=self.btnH, width=self.btnW, font=self.font)
+        self.btnEul = tkinter.Button(self.cwindow, text="e", command=lambda: self.on_press("euler"),
+                                     height=self.btnH, width=self.btnW, font=self.font)
         self.console = tkinter.Label(self.cwindow, textvariable=self.resVar, font=self.labelfont,
                                      height=self.btnH, width=self.btnW*5, anchor="e", relief="sunken", bg="ivory4", fg="honeydew2")
         self.__arrange()
@@ -101,7 +121,17 @@ class CGui:
         self.btnEnt.grid(row=5, column=3, columnspan=3, sticky="e"+"w")
         self.btnMem.grid(row=1, column=5)
         self.btnMre.grid(row=2, column=5)
-        self.console.grid(row=0, column=0, columnspan=6, sticky="e"+"w")
+        self.btnSqe.grid(row=3, column=5)
+        self.btnLog.grid(row=4, column=5)
+        self.btnSin.grid(row=1, column=6)
+        self.btnCos.grid(row=2, column=6)
+        self.btnTan.grid(row=3, column=6)
+        self.btnAsin.grid(row=1, column=7)
+        self.btnAcos.grid(row=2, column=7)
+        self.btnAtan.grid(row=3, column=7)
+        self.btnPi.grid(row=4, column=6)
+        self.btnEul.grid(row=4, column=7)
+        self.console.grid(row=0, column=0, columnspan=8, sticky="e"+"w")
 
     def on_press(self, press):
         self.calc.newdigit(press)
